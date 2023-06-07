@@ -5,7 +5,7 @@ import { FormEvent, useRef, useState } from 'react';
 import { NoteData, Tag } from './App';
 import { v4 as uuidV4 } from 'uuid';
 
-type NoteFormProps = {
+export type NoteFormProps = {
   onSubmit: (data: NoteData) => void
   onAddTag: (tag: Tag) => void
   availableTags: Tag[]
@@ -48,11 +48,10 @@ function NoteForm({ onSubmit, onAddTag, availableTags }: NoteFormProps) {
                       onAddTag(newTag)
                       setSelectedTags(prev => [...prev, newTag])
                     }}
-                    options={availableTags.map(tag => {
+                    options={ availableTags.map(tag => {
                       return { label: tag.label, value: tag.id }
                     })}
-                    value={selectedTags.map(tag => {
-                      console.log(tag);
+                    value={ selectedTags.map(tag => {
                       return { label: tag.label, value: tag.id }
                     })} 
                     onChange={ tags => {
