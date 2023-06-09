@@ -8,6 +8,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { NoteList } from './NoteList';
 import { NoteLayout } from './NoteLayout';
 import { Note } from './Note';
+import EditNote from './EditNote';
 
 export type Note = {
   id: string
@@ -53,8 +54,44 @@ function App() {
     })
   }
 
+  function onUpdateNote(id: string, { tags, ...data }: NoteData) {
+    setNotes(previousNotes => {
+      return previousNotes.map(note => {
+        if (note.id === id) {
+          return { ...note, ...data, tagIds: tags.map(tag => tag.id) }
+        } else {
+          return note
+        }
+      })
+    })
+  }
+
+  function onDeleteNote(id: string) {
+    setNotes(prevNotes => {
+      return prevNotes.filter(note => note.id !== id)
+    })
+  }
+
   function addTag(tag: Tag) {
     setTags(prev => [...prev, tag]);
+  }
+
+  function updateTag(id: string, label: string) {
+    setTags(prevTags => {
+      return prevTags.map(tag => {
+        if (id === tag.id) {
+          return { ...tag, label}
+        } else {
+          return tag
+        }
+      })
+    })
+  }
+
+  function deleteTag(id: string) {
+    setTags(prevTags => {
+      return prevTags.filter(tag => tag.id !== id)
+    })
   }
 
   return (
@@ -63,7 +100,13 @@ function App() {
         <Route 
           path='/' 
           element={
-            <NoteList notes={notesWithTags} availableTags={tags} />} 
+            <NoteList 
+              notes={notesWithTags} 
+              availableTags={tags} 
+              onUpdateTag={updateTag} 
+              onDeleteTag={deleteTag} 
+            />
+          } 
         />
         <Route 
           path='/new' 
@@ -76,8 +119,17 @@ function App() {
           } 
         />
         <Route path='/:id' element={<NoteLayout notes={notesWithTags} />}>
-          <Route index element={<Note />} />
-          <Route path='edit' element={<h1>Edit</h1>} />
+          <Route index element={<Note onDelete={onDeleteNote} />} />
+          <Route 
+            path='edit' 
+            element={
+              <EditNote 
+                onUpdate={onUpdateNote} 
+                onAddTag={addTag}
+                availableTags={tags}
+              />
+            } 
+          />
         </Route>
         <Route path='*' element={<Navigate to='/'/>} />
       </Routes>
